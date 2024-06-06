@@ -27,13 +27,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
         working-directory: ./app
-      - name: Run tests and check coverage
+      - name: Run tests and generate coverage report
         run: |
           pip install pytest pytest-cov
-          pytest --cov=app --cov-report=xml
+          pytest --cov=app --cov-report=term > result.log
         working-directory: ./app
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v2
+      - name: Post coverage comment to PR
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
-          name: coverage-report
-          path: app/coverage.xml
+          path: ./app/result.log
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
