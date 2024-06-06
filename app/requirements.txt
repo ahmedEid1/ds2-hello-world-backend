@@ -5,3 +5,4 @@ requests
 python-keycloak==4.0.0
 pytest==6.2.4
 pytest-cov==2.12.1
+coverage2md
