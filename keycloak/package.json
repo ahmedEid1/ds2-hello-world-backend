@@ -2,9 +2,9 @@
   "name": "configure-keycloak",
   "version": "1.0.0",
   "description": "Script to configure Keycloak",
-  "main": "configure-keycloak.js",
+  "main": "",
   "scripts": {
-    "start": "node configure-keycloak.js"
+    "start": "node "
   },
   "dependencies": {
     "axios": "^0.21.1"
