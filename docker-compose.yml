@@ -4,9 +4,11 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: helloworld
+      MYSQL_ROOT_HOST: '%'
     volumes:
       - db_data:/var/lib/mysql
-
+    networks:
+      - mynetwork
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.0
@@ -23,7 +25,8 @@ services:
       - "8080:8080"
     depends_on:
       - keycloak-db
-
+    networks:
+      - mynetwork
 
   keycloak-db:
     image: postgres:12
@@ -33,12 +36,15 @@ services:
       POSTGRES_PASSWORD: keycloakpassword
     volumes:
       - keycloak_data:/var/lib/postgresql/data
-
+    networks:
+      - mynetwork
 
   configure-keycloak:
     build: ./keycloak
     depends_on:
       - keycloak
+    networks:
+      - mynetwork
 
   backend:
     build: ./app
@@ -52,8 +58,13 @@ services:
     depends_on:
       - database
       - keycloak
-
+    networks:
+      - mynetwork
 
 volumes:
   db_data:
   keycloak_data:
+
+networks:
+  mynetwork:
+    driver: bridge

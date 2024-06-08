@@ -1,0 +1,9 @@
+resources:
+  - backend-deployment.yaml
+  - backend-service.yaml
+  - keycloak-db-deployment.yaml
+  - keycloak-deployment.yaml
+  - keycloak-service.yaml
+  - mysql-deployment.yaml
+  - pvc.yaml
+  - configure-keycloak-deployment.yaml
