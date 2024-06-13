@@ -1,4 +1,4 @@
-name: Kubernetes Connection Debug
+name: Backend CI/CD
 
 on:
   push:
@@ -7,42 +7,60 @@ on:
       - dev
 
 jobs:
-  debug-k8s-connection:
+  build:
     runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build and push Docker images
+        run: |
+          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/my-backend:latest ./app
+          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest ./keycloak
+        working-directory: .
+
       - name: Create .kube directory
         run: mkdir -p $HOME/.kube
 
-      - name: Decode and Set Kubernetes context
-        run: |
-          echo "Decoding KUBE_CONFIG and setting up kubeconfig"
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > $HOME/.kube/config
-          echo "Kubeconfig file content:"
-          cat $HOME/.kube/config
-          echo "Kubeconfig file created at $HOME/.kube/config"
+      - name: Set Kubernetes context
+        run: echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > $HOME/.kube/config
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG }}
 
-      - name: Verify Kubernetes context
+      - name: Create Secrets for Development
+        if: github.ref == 'refs/heads/dev'
         run: |
-          echo "Verifying kubeconfig context"
-          kubectl config view
+          kubectl create secret generic backend-secret --from-literal=DB_USER=${{ secrets.DB_USER_DEV }} --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD_DEV }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic keycloak-db-secret --from-literal=POSTGRES_USER=${{ secrets.POSTGRES_USER }} --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic keycloak-secret --from-literal=KEYCLOAK_ADMIN=${{ secrets.KEYCLOAK_ADMIN }} --from-literal=KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }} --from-literal=DB_USER=${{ secrets.POSTGRES_USER }} --from-literal=DB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic mysql-secret --from-literal=MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD_DEV }} --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Test raw connection to Kubernetes API server
+      - name: Create Secrets for Production
+        if: github.ref == 'refs/heads/main'
         run: |
-          echo "Testing raw connection to Kubernetes API server"
-          api_server=$(kubectl config view -o jsonpath='{.clusters[0].cluster.server}' | sed 's/https:\/\///')
-          echo "API Server: $api_server"
-          if nc -zv $(echo $api_server | cut -d: -f1) $(echo $api_server | cut -d: -f2); then
-            echo "Connection to Kubernetes API server successful"
-          else
-            echo "Failed to connect to Kubernetes API server"
-            exit 1
-          fi
+          kubectl create secret generic backend-secret --from-literal=DB_USER=${{ secrets.DB_USER_PROD }} --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD_PROD }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic keycloak-db-secret --from-literal=POSTGRES_USER=${{ secrets.POSTGRES_USER }} --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic keycloak-secret --from-literal=KEYCLOAK_ADMIN=${{ secrets.KEYCLOAK_ADMIN }} --from-literal=KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }} --from-literal=DB_USER=${{ secrets.POSTGRES_USER }} --from-literal=DB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic mysql-secret --from-literal=MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD_PROD }} --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Check Kubernetes cluster connectivity
+      - name: Deploy to Development
+        if: github.ref == 'refs/heads/dev'
         run: |
-          echo "Checking Kubernetes cluster connectivity"
-          kubectl get nodes
+          kubectl apply -k k8s/overlays/dev
+
+      - name: Deploy to Production
+        if: github.ref == 'refs/heads/main'
+        run: |
+          kubectl apply -k k8s/overlays/prod
