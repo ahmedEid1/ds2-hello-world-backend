@@ -39,6 +39,9 @@ jobs:
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG }}
 
+      - name: verify connection
+        run: kubectl get nodes
+
       - name: Create Secrets for Development
         if: github.ref == 'refs/heads/dev'
         run: |
