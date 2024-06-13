@@ -29,7 +29,7 @@ jobs:
         run: |
           docker buildx build --push --tag my-dockerhub-username/my-backend:latest .
           docker buildx build --push --tag my-dockerhub-username/configure-keycloak:latest ./keycloak
-        working-directory: ./backend-service
+        working-directory: .
 
       - name: Set Kubernetes context
         run: echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > $HOME/.kube/config
