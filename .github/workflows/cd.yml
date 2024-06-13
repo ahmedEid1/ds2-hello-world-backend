@@ -25,11 +25,11 @@ jobs:
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      # - name: Build and push Docker images
-      #   run: |
-      #     docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/my-backend:latest ./app
-      #     docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest ./keycloak
-      #   working-directory: .
+      - name: Build and push Docker images
+        run: |
+          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/my-backend:latest ./app
+          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest ./keycloak
+        working-directory: .
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -40,11 +40,6 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: 'latest'
-
-      - name: Enable required APIs
-        run: |
-          gcloud services enable container.googleapis.com
-          gcloud services enable cloudresourcemanager.googleapis.com
 
       - name: Install gke-gcloud-auth-plugin
         run: |
