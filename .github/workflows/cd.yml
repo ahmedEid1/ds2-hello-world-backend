@@ -31,6 +31,9 @@ jobs:
           docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest ./keycloak
         working-directory: .
 
+      - name: Create .kube directory
+        run: mkdir -p $HOME/.kube
+
       - name: Set Kubernetes context
         run: echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > $HOME/.kube/config
         env:
