@@ -25,19 +25,29 @@ jobs:
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      # - name: Build and push Docker images
-      #   run: |
-      #     docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/my-backend:latest ./app
-      #     docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest ./keycloak
-      #   working-directory: .
+      - name: Build and push Docker images
+        run: |
+          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/my-backend:latest ./app
+          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest ./keycloak
+        working-directory: .
 
-      - name: Create .kube directory
-        run: mkdir -p $HOME/.kube
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          version: 'latest'
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
 
-      - name: Set Kubernetes context
-        run: echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > $HOME/.kube/config
-        env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG }}
+      - name: Authenticate to GKE
+        run: |
+          gcloud config set project ${{ secrets.GCP_PROJECT }}
+          gcloud config set compute/zone ${{ secrets.GKE_ZONE }}
+          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
 
       - name: verify connection
         run: kubectl get nodes
