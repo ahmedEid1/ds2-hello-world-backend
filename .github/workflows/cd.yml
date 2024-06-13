@@ -27,8 +27,8 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          docker buildx build --push --tag my-dockerhub-username/my-backend:latest ./app
-          docker buildx build --push --tag my-dockerhub-username/configure-keycloak:latest ./keycloak
+          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/my-backend:latest ./app
+          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest ./keycloak
         working-directory: .
 
       - name: Set Kubernetes context
