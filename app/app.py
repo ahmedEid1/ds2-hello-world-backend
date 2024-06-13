@@ -59,6 +59,7 @@ def hello():
         token_info = keycloak_openid.decode_token(token.split(' ')[1])
         # the introspect is not working (because front and back are using deffirent domains)
         # token_info = keycloak_openid.introspect(token.split(' ')[1])
+
     except requests.exceptions.RequestException as e:
         # log the error details
         print(e)

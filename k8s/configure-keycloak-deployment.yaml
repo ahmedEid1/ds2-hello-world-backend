@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: configure-keycloak
+  labels:
+    app: configure-keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: configure-keycloak
+  template:
+    metadata:
+      labels:
+        app: configure-keycloak
+    spec:
+      containers:
+        - name: configure-keycloak
+          image: my-dockerhub-username/configure-keycloak:latest
+          command: ["node", "configure-keycloak.js"]
+      restartPolicy: OnFailure

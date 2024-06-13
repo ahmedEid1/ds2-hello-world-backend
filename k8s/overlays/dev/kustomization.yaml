@@ -1,0 +1,19 @@
+namespace: dev
+resources:
+  - ../../base
+configMapGenerator:
+  - name: backend-config
+    literals:
+      - DB_HOST=mysql-dev
+      - DB_NAME=helloworld-dev
+  - name: keycloak-db-config
+    literals:
+      - POSTGRES_DB=keycloak
+  - name: keycloak-config
+    literals:
+      - DB_VENDOR=postgres
+      - DB_ADDR=keycloak-db
+      - DB_DATABASE=keycloak
+  - name: mysql-config
+    literals:
+      - MYSQL_DATABASE=helloworld
