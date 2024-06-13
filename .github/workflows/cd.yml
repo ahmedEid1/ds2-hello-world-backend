@@ -30,8 +30,19 @@ jobs:
           echo "Verifying kubeconfig context"
           kubectl config view
 
+      - name: Test raw connection to Kubernetes API server
+        run: |
+          echo "Testing raw connection to Kubernetes API server"
+          api_server=$(kubectl config view -o jsonpath='{.clusters[0].cluster.server}' | sed 's/https:\/\///')
+          echo "API Server: $api_server"
+          if nc -zv $(echo $api_server | cut -d: -f1) $(echo $api_server | cut -d: -f2); then
+            echo "Connection to Kubernetes API server successful"
+          else
+            echo "Failed to connect to Kubernetes API server"
+            exit 1
+          fi
+
       - name: Check Kubernetes cluster connectivity
         run: |
           echo "Checking Kubernetes cluster connectivity"
-          kubectl cluster-info
           kubectl get nodes
