@@ -28,4 +28,10 @@ spec:
             name: keycloak-secret
         ports:
         - containerPort: 8080
-        command: ["kc.sh", "start"]
+        command: ["sh", "-c", "/opt/keycloak/bin/kc.sh start"]
+        readinessProbe:
+          httpGet:
+            path: /auth
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
