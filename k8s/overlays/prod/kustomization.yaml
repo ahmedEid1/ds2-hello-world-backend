@@ -4,8 +4,8 @@ resources:
 configMapGenerator:
   - name: backend-config
     literals:
-      - DB_HOST=mysql-prod
-      - DB_NAME=helloworld-prod
+      - DB_HOST=mysql
+      - DB_NAME=helloworld
   - name: keycloak-db-config
     literals:
       - POSTGRES_DB=keycloak
