@@ -28,3 +28,4 @@ spec:
             name: keycloak-secret
         ports:
         - containerPort: 8080
+        command: ["kc.sh", "start"]
