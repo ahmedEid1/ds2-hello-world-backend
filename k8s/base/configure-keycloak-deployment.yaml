@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: configure-keycloak
-        image: ${KEYCLOAK_CONFIG_IMAGE_TAG}
+        image: ahmedbest/configure-keycloak:latest
         command: ["node", "configure-keycloak.js"]
         envFrom:
         - configMapRef:
