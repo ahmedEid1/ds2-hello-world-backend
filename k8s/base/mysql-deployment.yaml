@@ -14,16 +14,9 @@ spec:
       labels:
         app: mysql
     spec:
-      initContainers:
-      - name: init-mysql
-        image: busybox
-        command: ['sh', '-c', 'rm -rf /var/lib/mysql/*']
-        volumeMounts:
-        - name: mysql-persistent-storage
-          mountPath: /var/lib/mysql
       containers:
       - name: mysql
-        image: mysql:5.7
+        image: mysql:latest
         envFrom:
         - configMapRef:
             name: mysql-config
