@@ -14,13 +14,13 @@ spec:
       labels:
         app: keycloak-db
     spec:
-      initContainers:
-      - name: init-postgresql
-        image: busybox
-        command: ['sh', '-c', 'rm -rf /var/lib/postgresql/data/*; mkdir -p /var/lib/postgresql/data/pgdata']
-        volumeMounts:
-        - name: postgres-persistent-storage
-          mountPath: /var/lib/postgresql/data
+#      initContainers:
+#      - name: init-postgresql
+#        image: busybox
+#        command: ['sh', '-c', 'rm -rf /var/lib/postgresql/data/*; mkdir -p /var/lib/postgresql/data/pgdata']
+#        volumeMounts:
+#        - name: postgres-persistent-storage
+#          mountPath: /var/lib/postgresql/data
       containers:
       - name: postgres
         image: postgres:12
