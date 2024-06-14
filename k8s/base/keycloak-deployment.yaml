@@ -14,6 +14,10 @@ spec:
       labels:
         app: keycloak
     spec:
+      initContainers:
+      - name: wait-for-db
+        image: busybox
+        command: ['sh', '-c', 'until nc -z -v -w30 keycloak-db 5432; do echo "waiting for database"; sleep 5; done']
       containers:
       - name: keycloak
         image: quay.io/keycloak/keycloak:24.0.0
