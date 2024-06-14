@@ -16,6 +16,10 @@ spec:
     spec:
       containers:
       - name: configure-keycloak
-        image: my-dockerhub-username/configure-keycloak:latest
+        image: ${KEYCLOAK_CONFIG_IMAGE_TAG}
         command: ["node", "configure-keycloak.js"]
-# TODO: add the username/pass as env
+        envFrom:
+        - configMapRef:
+            name: keycloak-config
+        - secretRef:
+            name: keycloak-secret

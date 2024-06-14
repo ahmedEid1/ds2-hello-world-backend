@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: my-dockerhub-username/my-backend:latest
+        image: ${BACKEND_IMAGE_TAG}
         ports:
         - containerPort: 5000
         envFrom:

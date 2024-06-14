@@ -25,11 +25,11 @@ jobs:
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-#      - name: Build and push Docker images
-#        run: |
-#          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/my-backend:latest ./app
-#          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest ./keycloak
-#        working-directory: .
+      - name: Build and push Docker images
+        run: |
+          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/backend-service:latest ./app
+          docker buildx build --push --tag ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest ./keycloak
+        working-directory: .
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -63,10 +63,12 @@ jobs:
         run: kubectl get nodes
 
       - name: Create prod namespace
+        if: github.ref == 'refs/heads/main'
         run: |
           kubectl create namespace prod || echo "Namespace prod already exists"
 
       - name: Create dev namespace
+        if: github.ref == 'refs/heads/dev'
         run: |
           kubectl create namespace dev || echo "Namespace dev already exists"
 
@@ -88,10 +90,18 @@ jobs:
 
       - name: Deploy to Development
         if: github.ref == 'refs/heads/dev'
-        run: |
-          kubectl apply -k k8s/overlays/dev
+        env:
+          BACKEND_IMAGE_TAG: ${{ secrets.DOCKER_USERNAME }}/backend-service:latest
+          KEYCLOAK_CONFIG_IMAGE_TAG: ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest
+          run: |
+            envsubst < k8s/overlays/dev/deployment.yaml | kubectl apply -f -
+            kubectl apply -k k8s/overlays/dev
 
       - name: Deploy to Production
         if: github.ref == 'refs/heads/main'
-        run: |
-          kubectl apply -k k8s/overlays/prod
+        env:
+          BACKEND_IMAGE_TAG: ${{ secrets.DOCKER_USERNAME }}/backend-service:latest
+          KEYCLOAK_CONFIG_IMAGE_TAG: ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest
+          run: |
+            envsubst < k8s/overlays/prod/deployment.yaml | kubectl apply -f -
+            kubectl apply -k k8s/overlays/prod

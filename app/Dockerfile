@@ -14,4 +14,4 @@ RUN apt-get update && apt-get install -y netcat-openbsd
 # Make the script executable
 RUN chmod +x /wait-for-it.sh
 
-CMD ["/wait-for-it.sh", "database", "3306", "--", "python", "app.py"]
+CMD ["/wait-for-it.sh", "mysql", "3306", "--", "python", "app.py"]
