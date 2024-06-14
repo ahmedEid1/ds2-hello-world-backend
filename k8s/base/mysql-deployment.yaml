@@ -16,8 +16,6 @@ spec:
     spec:
       containers:
       - name: mysql
-        args:
-          - "ignore-db-dir=lost+found"
         image: mysql:5.7
         envFrom:
         - configMapRef:
