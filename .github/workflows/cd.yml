@@ -93,15 +93,15 @@ jobs:
         env:
           BACKEND_IMAGE_TAG: ${{ secrets.DOCKER_USERNAME }}/backend-service:latest
           KEYCLOAK_CONFIG_IMAGE_TAG: ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest
-          run: |
-            envsubst < k8s/overlays/dev/deployment.yaml | kubectl apply -f -
-            kubectl apply -k k8s/overlays/dev
+        run: |
+          envsubst < k8s/overlays/dev/deployment.yaml | kubectl apply -f -
+          kubectl apply -k k8s/overlays/dev
 
       - name: Deploy to Production
         if: github.ref == 'refs/heads/main'
         env:
           BACKEND_IMAGE_TAG: ${{ secrets.DOCKER_USERNAME }}/backend-service:latest
           KEYCLOAK_CONFIG_IMAGE_TAG: ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest
-          run: |
-            envsubst < k8s/overlays/prod/deployment.yaml | kubectl apply -f -
-            kubectl apply -k k8s/overlays/prod
+        run: |
+          envsubst < k8s/overlays/prod/deployment.yaml | kubectl apply -f -
+          kubectl apply -k k8s/overlays/prod
