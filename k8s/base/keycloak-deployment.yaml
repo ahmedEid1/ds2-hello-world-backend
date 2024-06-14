@@ -14,10 +14,6 @@ spec:
       labels:
         app: keycloak
     spec:
-      initContainers:
-      - name: wait-for-db
-        image: busybox
-        command: ['sh', '-c', 'until nc -z -v -w30 keycloak-db 5432; do echo "waiting for database"; sleep 5; done']
       containers:
       - name: keycloak
         image: quay.io/keycloak/keycloak:24.0.0
@@ -29,9 +25,3 @@ spec:
         ports:
         - containerPort: 8080
         command: ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev"]
-        readinessProbe:
-          httpGet:
-            path: /auth
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 10
