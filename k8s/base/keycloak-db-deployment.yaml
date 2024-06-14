@@ -33,14 +33,6 @@ spec:
         - name: postgres-persistent-storage
           mountPath: /var/lib/postgresql/data
           subPath: pgdata
-        readinessProbe:
-          exec:
-            command:
-            - pg_isready
-            - -d
-            - postgresql://$(DB_USER):$(DB_PASSWORD)@localhost:5432/$(DB_NAME)
-          initialDelaySeconds: 5
-          periodSeconds: 10
       volumes:
       - name: postgres-persistent-storage
         persistentVolumeClaim:
