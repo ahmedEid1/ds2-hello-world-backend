@@ -17,7 +17,7 @@ spec:
       initContainers:
       - name: init-postgresql
         image: busybox
-        command: ['sh', '-c', 'rm -rf /var/lib/postgresql/data/pgdata/*; mkdir -p /var/lib/postgresql/data/pgdata']
+        command: ['sh', '-c', 'rm -rf /var/lib/postgresql/data/*; mkdir -p /var/lib/postgresql/data/pgdata']
         volumeMounts:
         - name: postgres-persistent-storage
           mountPath: /var/lib/postgresql/data
