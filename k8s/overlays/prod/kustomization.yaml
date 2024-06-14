@@ -17,3 +17,4 @@ configMapGenerator:
   - name: mysql-config
     literals:
       - MYSQL_DATABASE=helloworld
+      - MYSQL_ROOT_HOST=%

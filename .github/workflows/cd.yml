@@ -94,36 +94,9 @@ jobs:
           BACKEND_IMAGE_TAG: ${{ secrets.DOCKER_USERNAME }}/backend-service:latest
           KEYCLOAK_CONFIG_IMAGE_TAG: ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest
         run: |
-          if [ -f k8s/base/backend-deployment.yaml ]; then
-            envsubst < k8s/base/backend-deployment.yaml | kubectl apply -f -
-          else
-            echo "File k8s/base/backend-deployment.yaml does not exist"
-            exit 1
-          fi
-          if [ -f k8s/base/configure-keycloak-deployment.yaml ]; then
-            envsubst < k8s/base/configure-keycloak-deployment.yaml | kubectl apply -f -
-          else
-            echo "File k8s/base/configure-keycloak-deployment.yaml does not exist"
-            exit 1
-          fi
           kubectl apply -k k8s/overlays/dev
 
       - name: Deploy to Production
         if: github.ref == 'refs/heads/main'
-        env:
-          BACKEND_IMAGE_TAG: ${{ secrets.DOCKER_USERNAME }}/backend-service:latest
-          KEYCLOAK_CONFIG_IMAGE_TAG: ${{ secrets.DOCKER_USERNAME }}/configure-keycloak:latest
         run: |
-          if [ -f k8s/base/backend-deployment.yaml ]; then
-            envsubst < k8s/base/backend-deployment.yaml | kubectl apply -f -
-          else
-            echo "File k8s/base/backend-deployment.yaml does not exist"
-            exit 1
-          fi
-          if [ -f k8s/base/configure-keycloak-deployment.yaml ]; then
-            envsubst < k8s/base/configure-keycloak-deployment.yaml | kubectl apply -f -
-          else
-            echo "File k8s/base/configure-keycloak-deployment.yaml does not exist"
-            exit 1
-          fi
           kubectl apply -k k8s/overlays/prod
