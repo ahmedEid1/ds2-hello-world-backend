@@ -8,4 +8,4 @@ resources:
   - mysql-deployment.yaml
   - mysql-service.yaml
   - pvc.yaml
-  - configure-keycloak-deployment.yaml
+  - configure-keycloak-job.yaml

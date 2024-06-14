@@ -1,14 +1,10 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: configure-keycloak
   labels:
     app: configure-keycloak
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: configure-keycloak
   template:
     metadata:
       labels:
@@ -23,3 +19,5 @@ spec:
             name: keycloak-config
         - secretRef:
             name: keycloak-secret
+      restartPolicy: Never
+  backoffLimit: 4
